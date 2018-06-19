@@ -62,7 +62,7 @@ func ExampleNew() {
 	}
 
 	// Migrate all the way up ...
-	if err := m.Up(); err != nil {
+	if err := m.Up(false); err != nil {
 		log.Fatal(err)
 	}
 }
@@ -117,7 +117,7 @@ func ExampleNewWithDatabaseInstance() {
 	}
 
 	// Migrate all the way up ...
-	if err := m.Up(); err != nil {
+	if err := m.Up(false); err != nil {
 		log.Fatal(err)
 	}
 }
@@ -167,7 +167,7 @@ func ExampleNewWithSourceInstance() {
 	}
 
 	// Migrate all the way up ...
-	if err := m.Up(); err != nil {
+	if err := m.Up(false); err != nil {
 		log.Fatal(err)
 	}
 }
@@ -382,7 +382,7 @@ func TestUpAndDown(t *testing.T) {
 	seq := newMigSeq()
 
 	// go Up first
-	if err := m.Up(); err != nil {
+	if err := m.Up(false); err != nil {
 		t.Fatal(err)
 	}
 	equalDbSeq(t, 0, seq.add(M(1), M(3), M(4), M(5), M(7)), dbDrv)
@@ -397,7 +397,7 @@ func TestUpAndDown(t *testing.T) {
 	if err := m.Steps(1); err != nil {
 		t.Fatal(err)
 	}
-	if err := m.Up(); err != nil {
+	if err := m.Up(false); err != nil {
 		t.Fatal(err)
 	}
 	equalDbSeq(t, 2, seq.add(M(1), M(3), M(4), M(5), M(7)), dbDrv)
@@ -419,7 +419,7 @@ func TestUpDirty(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	err := m.Up()
+	err := m.Up(false)
 	if _, ok := err.(ErrDirty); !ok {
 		t.Fatalf("expected ErrDirty, got %v", err)
 	}
@@ -751,7 +751,7 @@ func TestReadUp(t *testing.T) {
 
 	for i, v := range tt {
 		ret := make(chan interface{})
-		go m.readUp(v.from, v.limit, ret)
+		go m.readUp(v.from, v.limit, ret, false)
 		migrations, err := migrationsFromChannel(ret)
 
 		if (v.expectErr == os.ErrNotExist && !os.IsNotExist(err)) ||
