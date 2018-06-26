@@ -276,13 +276,25 @@ func (m *Migrate) Up(includeMissing bool) error {
 		if err != nil {
 			return m.unlockErr(err)
 		}
+
+		firstVersion := 0
+		firstDirty := false
 		if (len(allVersions) > 0) {
 			for k, v := range allVersions {
 				curVersion, _ = strconv.Atoi(k)
 				dirty = v
-				break
+				// throw error if any versions are dirty
+				if dirty {
+					return m.unlockErr(ErrDirty{curVersion})
+				}
+				if firstVersion == 0 {
+					firstVersion = curVersion
+					firstDirty = dirty
+				}
 			}
 		}
+		curVersion = firstVersion
+		dirty = firstDirty
 	}
 
 	if err != nil {
