@@ -265,16 +265,17 @@ func (m *Mysql) Version() (version int, dirty bool, err error) {
 	}
 }
 
-func (m *Mysql) GetAllVersions() (versions map[string]bool, err error) {
+func (m *Mysql) GetAllVersions() (versions map[int]bool, err error) {
 	query := "SELECT * FROM `" + m.config.MigrationsTable + "`"
 	migrations, err := m.conn.QueryContext(context.Background(), query)
 	if err != nil {
 		return nil, &database.Error{OrigErr: err, Query: []byte(query)}
 	}
-	versions = make(map[string]bool)
+	versions = make(map[int]bool)
 	defer migrations.Close()
 	for migrations.Next() {
-		var versionNumber string
+
+		var versionNumber int
 		var dirty bool
 		if err := migrations.Scan(&versionNumber, &dirty); err != nil {
 			return nil, err

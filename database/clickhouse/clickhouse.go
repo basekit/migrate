@@ -118,7 +118,7 @@ func (ch *ClickHouse) Version() (int, bool, error) {
 	return version, dirty == 1, nil
 }
 
-func (ch *ClickHouse) GetAllVersions() (versions map[string]bool, err error) {
+func (ch *ClickHouse) GetAllVersions() (versions map[int]bool, err error) {
 	return versions, err
 }
 

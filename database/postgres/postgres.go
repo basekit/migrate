@@ -221,7 +221,7 @@ func (p *Postgres) Version() (version int, dirty bool, err error) {
 	}
 }
 
-func (p *Postgres) GetAllVersions() (versions map[string]bool, err error) {
+func (p *Postgres) GetAllVersions() (versions map[int]bool, err error) {
 	return versions, err
 }
 

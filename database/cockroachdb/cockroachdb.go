@@ -265,7 +265,7 @@ func (c *CockroachDb) Version() (version int, dirty bool, err error) {
 	}
 }
 
-func (c *CockroachDb) GetAllVersions() (versions map[string]bool, err error) {
+func (c *CockroachDb) GetAllVersions() (versions map[int]bool, err error) {
 	return versions, err
 }
 

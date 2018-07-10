@@ -197,7 +197,7 @@ func (c *Cassandra) Version() (version int, dirty bool, err error) {
 	}
 }
 
-func (c *Cassandra) GetAllVersions() (versions map[string]bool, err error) {
+func (c *Cassandra) GetAllVersions() (versions map[int]bool, err error) {
 	return versions, err
 }
 

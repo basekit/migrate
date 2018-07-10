@@ -74,7 +74,7 @@ type Driver interface {
 	Version() (version int, dirty bool, err error)
 
 	// GetAllVersions returns all the stored versions
-	GetAllVersions() (versions map[string]bool, err error)
+	GetAllVersions() (versions map[int]bool, err error)
 
 	// Drop deletes everything in the database.
 	Drop() error

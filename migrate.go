@@ -7,9 +7,9 @@ package migrate
 import (
 	"fmt"
 	"os"
+	"sort"
 	"sync"
 	"time"
-	"strconv"
 
 	"github.com/basekit/migrate/database"
 	"github.com/basekit/migrate/source"
@@ -268,33 +268,26 @@ func (m *Migrate) Up(includeMissing bool) error {
 		return err
 	}
 
-	allVersions := make(map[string]bool)
 	curVersion, dirty, err := m.databaseDrv.Version()
 
 	if includeMissing == true && curVersion >= 0 {
-		allVersions, err = m.databaseDrv.GetAllVersions()
+		allVersions, err := m.databaseDrv.GetAllVersions()
 		if err != nil {
 			return m.unlockErr(err)
 		}
 
-		firstVersion := 0
-		firstDirty := false
 		if (len(allVersions) > 0) {
-			for k, v := range allVersions {
-				curVersion, _ = strconv.Atoi(k)
-				dirty = v
-				// throw error if any versions are dirty
-				if dirty {
-					return m.unlockErr(ErrDirty{curVersion})
-				}
-				if firstVersion == 0 {
-					firstVersion = curVersion
-					firstDirty = dirty
-				}
+			sortedKeys := make([]int, 0, len(allVersions))
+			for k := range allVersions {
+				sortedKeys = append(sortedKeys, k)
+			}
+			sort.Ints(sortedKeys)
+			for _, v := range sortedKeys {
+				curVersion = v
+				dirty = allVersions[v]
+				break
 			}
 		}
-		curVersion = firstVersion
-		dirty = firstDirty
 	}
 
 	if err != nil {
@@ -550,7 +543,7 @@ func (m *Migrate) readUp(from int, limit int, ret chan<- interface{}, includeMis
 		return
 	}
 
-	allVersions := make(map[string]bool)
+	allVersions := make(map[int]bool)
 	var err error
 	versionCheck := false;
 	if includeMissing == true {
@@ -594,8 +587,7 @@ func (m *Migrate) readUp(from int, limit int, ret chan<- interface{}, includeMis
 		// apply next migration
 		next, err := m.sourceDrv.Next(suint(from))
 		if versionCheck == true {
-			nextStr := fmt.Sprint(next)
-			if _, ok := allVersions[nextStr]; ok {
+			if _, ok := allVersions[int(next)]; ok {
 				from = int(next)
 				continue
 			}
