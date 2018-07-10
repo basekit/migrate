@@ -271,7 +271,7 @@ func (m *Migrate) Up(includeMissing bool) error {
 	allVersions := make(map[string]bool)
 	curVersion, dirty, err := m.databaseDrv.Version()
 
-	if includeMissing == true {
+	if includeMissing == true && curVersion >= 0 {
 		allVersions, err = m.databaseDrv.GetAllVersions()
 		if err != nil {
 			return m.unlockErr(err)
