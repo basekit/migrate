@@ -280,6 +280,9 @@ func (m *Migrate) Up(includeMissing bool) error {
 			sortedKeys := make([]int, 0, len(allVersions))
 			for k := range allVersions {
 				sortedKeys = append(sortedKeys, k)
+				if allVersions[k] == true {
+					return m.unlockErr(ErrDirty{k})
+				}
 			}
 			sort.Ints(sortedKeys)
 			for _, v := range sortedKeys {
